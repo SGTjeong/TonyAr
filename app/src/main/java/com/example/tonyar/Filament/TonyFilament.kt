@@ -2,6 +2,7 @@ package com.example.tonyar.Filament
 
 import android.content.Context
 import android.opengl.*
+import android.util.Log
 import android.view.Surface
 import android.view.SurfaceView
 import com.google.android.filament.*
@@ -31,11 +32,9 @@ class TonyFilament(context : Context, val surfaceView: SurfaceView) {
             view.scene = scene
         }
 
-    val assetLoader =
-        AssetLoader(engine, MaterialProvider(engine), EntityManager.get())
+    val assetLoader = AssetLoader(engine, MaterialProvider(engine), EntityManager.get())
 
-    val resourceLoader =
-        ResourceLoader(engine)
+    val resourceLoader = ResourceLoader(engine)
 
     var swapChain: SwapChain? = null
     val displayHelper = DisplayHelper(context)
@@ -58,7 +57,8 @@ class TonyFilament(context : Context, val surfaceView: SurfaceView) {
             }
 
             override fun onResized(width: Int, height: Int) {
-                view.viewport = Viewport(0,0,width, height)
+                view.viewport = Viewport(0,0, width, height)
+                Log.e("WONSIK", "$desiredWidth, $desiredHeight")
             }
         }
 
@@ -104,6 +104,8 @@ class TonyFilament(context : Context, val surfaceView: SurfaceView) {
                 intArrayOf(EGL14.EGL_WIDTH, 1, EGL14.EGL_HEIGHT, 1, EGL14.EGL_NONE),
                 0
             )
+
+        EGL14.eglMakeCurrent(display, surface, surface, context)
 
         return context
     }

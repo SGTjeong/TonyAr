@@ -1,7 +1,9 @@
-package com.example.tonyar
+package com.example.tonyar.Filament
 
 import android.content.Context
-import com.example.tonyar.Filament.TonyFilament
+import android.util.Log
+import com.example.tonyar.m4Identity
+import com.example.tonyar.readUncompressedAsset
 import com.google.android.filament.*
 import com.google.ar.core.Frame
 
@@ -14,16 +16,17 @@ class MaterialFactory {
             val width = dimensions[0]
             val height = dimensions[1]
 
+            Log.e("WONSIK", "createStream : ${width}, ${height}")
             return Stream
                 .Builder()
-                .stream(cameraStreamTextureId)
+                .stream(cameraStreamTextureId.toLong())
                 .width(width)
                 .height(height)
                 .build(filament.engine)
         }
 
         fun createFlatMaterialInstance(context : Context, filament : TonyFilament, stream : Stream) : MaterialInstance{
-            val materialInstance = context.readUncompressedAsset("tony")
+            val materialInstance = context.readUncompressedAsset("materials/flat.filamat")
                 .let{ byteBuffer ->
                     Material
                         .Builder()
