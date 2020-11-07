@@ -16,6 +16,7 @@ import com.example.tonyar.*
 import com.example.tonyar.Filament.BufferFactory
 import com.example.tonyar.Filament.MaterialFactory
 import com.example.tonyar.Filament.TonyFilament
+import com.example.tonyar.TonyAR.CameraStream
 import com.google.android.filament.*
 import com.google.ar.core.Config
 import com.google.ar.core.Frame
@@ -30,7 +31,7 @@ class TonyArCore(
     private val view : View) {
 
     private val cameraStreamTextureId: Int = createExternalTextureId()
-    private lateinit var stream: Stream
+    private lateinit var cameraStream: CameraStream
     private lateinit var depthMaterialInstance: MaterialInstance
     private lateinit var flatMaterialInstance: MaterialInstance
 
@@ -164,8 +165,9 @@ class TonyArCore(
 
         view.post {
             Log.e("WONSIK", "${filament.uiHelper.desiredWidth},  ${filament.uiHelper.desiredHeight}, ${view.width}, ${view.height}, ${displayWidth}, ${displayHeight}")
-            session.setDisplayGeometry(displayRotation, displayWidth, displayHeight)
-            setDesiredSize(displayWidth, displayHeight)
+            Log.e("WONSIK", "$displayRotation")
+            session.setDisplayGeometry(displayRotation, view.width, view.height)
+            setDesiredSize(view.width, view.height)
         }
     }
 
@@ -178,8 +180,14 @@ class TonyArCore(
         if (firstFrame) {
             configurationChange()
             initFlatMaterialInstance()
-            initFlat()
+            initCameraStream()
         }
+
+        if(frame.hasDisplayGeometryChanged()){
+            //Log.e("WONSIK", "shouldRecalculate")
+            cameraStream.recalculateCameraUvs(frame)
+        }
+
 
         flatMaterialInstance.setParameter(
             "uvTransform",
@@ -211,22 +219,8 @@ class TonyArCore(
         flatMaterialInstance = MaterialFactory.createFlatMaterialInstance(activity, filament, stream)
     }
 
-    private fun initFlat() {
-        val mb = tessellation(1, 1)
-
-        RenderableManager
-            .Builder(1)
-            .castShadows(false)
-            .receiveShadows(false)
-            .culling(false)
-            .geometry(
-                0,
-                RenderableManager.PrimitiveType.TRIANGLES,
-                BufferFactory.createVertexBuffer(filament, mb),
-                BufferFactory.createIndexBuffer(filament, mb)
-            )
-            .material(0, flatMaterialInstance)
-            .build(filament.engine, EntityManager.get().create().also { flatRenderable = it })
+    private fun initCameraStream() {
+        cameraStream = CameraStream(cameraStreamTextureId, filament, flatMaterialInstance)
     }
 
     private fun tessellation(tesWidth: Int, tesHeight: Int): ModelBuffers {
