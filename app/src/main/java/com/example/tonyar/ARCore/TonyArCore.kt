@@ -188,7 +188,7 @@ class TonyArCore(
             cameraStream.recalculateCameraUvs(frame)
         }
 
-
+        /*
         flatMaterialInstance.setParameter(
             "uvTransform",
             MaterialInstance.FloatElement.FLOAT4,
@@ -196,6 +196,8 @@ class TonyArCore(
             0,
             4
         )
+        
+         */
 
         filament.scene.removeEntity(depthRenderable)
         filament.scene.addEntity(flatRenderable)
